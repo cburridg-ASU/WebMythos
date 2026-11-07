@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f2eee3">
+    <meta name="description" content="Mythos is a tactical board game of movement, characters, and dice duels.">
+    <title>Mythos | A game of paths and chance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="game.js" defer></script>
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="topbar">
+        <a class="wordmark" href="./" aria-label="Mythos home">
+          <span class="wordmark-mark" aria-hidden="true">M</span>
+          <span>MYTHOS</span>
+        </a>
+        <div class="topbar-note"><span class="live-dot"></span> FIELD TEST 01</div>
+        <button class="icon-button" id="new-game" type="button" title="Start a new game" aria-label="Start a new game">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4.8 9A7.5 7.5 0 0 1 18 6.5L20 12M4 17v-5h5m10.2 3A7.5 7.5 0 0 1 6 17.5L4 12"/></svg>
+        </button>
+      </header>
+
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">A TACTICAL GAME OF PATHS & CHANCE</p>
+          <h1 id="page-title">The Crossing</h1>
+        </div>
+        <p class="intro-copy">Guide your legends across the field. Read the board, choose your moment, and let the dice decide the duel.</p>
+      </section>
+
+      <section class="game-layout" aria-label="Mythos game">
+        <div class="board-column">
+          <div class="matchbar">
+            <div class="player-chip player-one" id="player-one-chip">
+              <span class="player-marker">I</span>
+              <span><small>PLAYER ONE</small><strong id="player-one-status">Your turn</strong></span>
+            </div>
+            <div class="round-label"><small>ROUND</small><strong id="round-number">01</strong></div>
+            <div class="player-chip player-two" id="player-two-chip">
+              <span><small>PLAYER TWO</small><strong id="player-two-status">Waiting</strong></span>
+              <span class="player-marker">II</span>
+            </div>
+          </div>
+
+          <div class="board-frame">
+            <div class="board-axis" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span></div>
+            <div class="board" id="board" role="grid" aria-label="Seven by seven game board"></div>
+            <div class="board-caption"><span>WESTERN GATE</span><span>THE CROSSING</span><span>EASTERN GATE</span></div>
+          </div>
+
+          <div class="turn-prompt" id="turn-prompt" aria-live="polite">
+            <span class="prompt-symbol" aria-hidden="true">↗</span>
+            <span id="prompt-text">Select one of your legends to see its moves.</span>
+            <button id="cancel-selection" type="button" class="text-button" hidden>Cancel</button>
+          </div>
+        </div>
+
+        <aside class="side-panel">
+          <section class="panel-section active-legend-section">
+            <div class="section-heading"><h2>LEGEND</h2><span id="selection-state">NO SELECTION</span></div>
+            <div class="legend-card" id="legend-card">
+              <div class="empty-portrait" aria-hidden="true">✳</div>
+              <div class="legend-info"><p class="legend-name">Choose a legend</p><p class="legend-description">Their path and die will appear here.</p></div>
+            </div>
+            <div class="legend-stats" id="legend-stats" hidden></div>
+          </section>
+
+          <section class="panel-section roster-section">
+            <div class="section-heading"><h2>YOUR LEGENDS</h2><span>3 FIGURES</span></div>
+            <div class="roster" id="roster"></div>
+          </section>
+
+          <section class="panel-section duel-section">
+            <div class="section-heading"><h2>LAST DUEL</h2><span id="duel-caption">D6 VS D6</span></div>
+            <div class="dice-stage" id="dice-stage" aria-live="polite">
+              <div class="die-wrap"><span id="attacker-label">—</span><div class="die" id="attacker-die">·</div></div>
+              <span class="versus">VS</span>
+              <div class="die-wrap"><span id="defender-label">—</span><div class="die" id="defender-die">·</div></div>
+            </div>
+            <p class="duel-result" id="duel-result">A duel appears here when legends meet.</p>
+          </section>
+
+          <section class="panel-section log-section">
+            <div class="section-heading"><h2>FIELD NOTES</h2><span>RECENT</span></div>
+            <ol class="field-log" id="field-log" aria-live="polite"></ol>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="footer-note">
+        <span><kbd>CLICK</kbd> Choose a legend and a highlighted tile</span>
+        <span><i class="legend-dot move-dot"></i> Move <i class="legend-dot duel-dot"></i> Duel <i class="legend-dot goal-dot"></i> Gate</span>
+      </footer>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
