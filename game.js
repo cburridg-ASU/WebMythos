@@ -1,93 +1,41 @@
+const SIZE = 7;
 const BENCH_SIZE = 6;
 
 const UNIT_TEMPLATES = [
   { id: "striker", name: "Striker", title: "Frontline Hunter", mark: "S", move: 3, faces: [0, 1, 2, 3, 4, 5], ability: "Rush: can move 3 spaces and pressure the lane." },
   { id: "guardian", name: "Guardian", title: "Shield Bearer", mark: "G", move: 2, faces: [0, 2, 2, 3, 4, 5], defense: 1, ability: "Aegis: +1 defense in duels." },
   { id: "seer", name: "Seer", title: "Star Oracle", mark: "O", move: 2, faces: [0, 1, 3, 4, 4, 6], critical: true, ability: "Astral: a 6 becomes a 7 in a duel." },
+  { id: "watcher", name: "Watcher", title: "Signal Scout", mark: "W", move: 2, faces: [0, 1, 2, 4, 5, 5], ability: "Insight: reads the lane and attacks from range." },
+  { id: "breaker", name: "Breaker", title: "Rift Fist", mark: "R", move: 3, faces: [0, 2, 2, 3, 4, 6], ability: "Break: a heavier rush unit for the front line." },
+  { id: "mender", name: "Mender", title: "Hearth Sage", mark: "M", move: 2, faces: [0, 1, 2, 3, 3, 4], ability: "Support: keeps the bench ready for the next push." },
 ];
 
-const BOARD_DEFS = [
-  { id: "p1-spawn-1", x: 0, y: 1, spawnFor: 1 },
-  { id: "p1-spawn-2", x: 0, y: 5, spawnFor: 1 },
-  { id: "p1-1", x: 1, y: 1 },
-  { id: "p1-2", x: 2, y: 1 },
-  { id: "p1-3", x: 3, y: 1 },
-  { id: "p1-4", x: 4, y: 1 },
-  { id: "p1-5", x: 5, y: 1 },
-  { id: "p1-6", x: 6, y: 1 },
-  { id: "p1-7", x: 1, y: 5 },
-  { id: "p1-8", x: 2, y: 5 },
-  { id: "p1-9", x: 3, y: 5 },
-  { id: "p1-10", x: 4, y: 5 },
-  { id: "p1-11", x: 5, y: 5 },
-  { id: "p1-mid-1", x: 5, y: 3 },
-  { id: "p1-mid-2", x: 6, y: 3 },
-  { id: "p1-goal", x: 6, y: 3, goalFor: 1 },
+const SPAWN_POSITIONS = {
+  1: [{ x: 0, y: 1 }, { x: 0, y: 5 }],
+  2: [{ x: SIZE - 1, y: 1 }, { x: SIZE - 1, y: 5 }],
+};
 
-  { id: "p2-spawn-1", x: 6, y: 1, spawnFor: 2 },
-  { id: "p2-spawn-2", x: 6, y: 5, spawnFor: 2 },
-  { id: "p2-1", x: 5, y: 1 },
-  { id: "p2-2", x: 4, y: 1 },
-  { id: "p2-3", x: 3, y: 1 },
-  { id: "p2-4", x: 2, y: 1 },
-  { id: "p2-5", x: 1, y: 1 },
-  { id: "p2-6", x: 1, y: 5 },
-  { id: "p2-7", x: 2, y: 5 },
-  { id: "p2-8", x: 3, y: 5 },
-  { id: "p2-9", x: 4, y: 5 },
-  { id: "p2-10", x: 5, y: 5 },
-  { id: "p2-mid-1", x: 1, y: 3 },
-  { id: "p2-mid-2", x: 0, y: 3 },
-  { id: "p2-goal", x: 0, y: 3, goalFor: 2 },
+const GOAL_POSITIONS = {
+  1: { x: SIZE - 1, y: Math.floor(SIZE / 2) },
+  2: { x: 0, y: Math.floor(SIZE / 2) },
+};
+
+const DIRECTIONS = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
 ];
-
-const BOARD_GRAPH = new Map([
-  ["p1-spawn-1", ["p1-1"]],
-  ["p1-1", ["p1-spawn-1", "p1-2"]],
-  ["p1-2", ["p1-1", "p1-3"]],
-  ["p1-3", ["p1-2", "p1-4", "p1-9"]],
-  ["p1-4", ["p1-3", "p1-5"]],
-  ["p1-5", ["p1-4", "p1-6", "p1-mid-1"]],
-  ["p1-6", ["p1-5", "p1-mid-2"]],
-  ["p1-mid-1", ["p1-5", "p1-mid-2", "p1-11"]],
-  ["p1-mid-2", ["p1-6", "p1-mid-1", "p1-goal"]],
-  ["p1-goal", ["p1-mid-2"]],
-
-  ["p1-spawn-2", ["p1-7"]],
-  ["p1-7", ["p1-spawn-2", "p1-8"]],
-  ["p1-8", ["p1-7", "p1-9"]],
-  ["p1-9", ["p1-8", "p1-10", "p1-3"]],
-  ["p1-10", ["p1-9", "p1-11"]],
-  ["p1-11", ["p1-10", "p1-mid-1"]],
-
-  ["p2-spawn-1", ["p2-1"]],
-  ["p2-1", ["p2-spawn-1", "p2-2"]],
-  ["p2-2", ["p2-1", "p2-3"]],
-  ["p2-3", ["p2-2", "p2-4", "p2-8"]],
-  ["p2-4", ["p2-3", "p2-5"]],
-  ["p2-5", ["p2-4", "p2-6", "p2-mid-1"]],
-  ["p2-6", ["p2-5", "p2-mid-2"]],
-  ["p2-mid-1", ["p2-5", "p2-mid-2", "p2-6"]],
-  ["p2-mid-2", ["p2-mid-1", "p2-goal"]],
-  ["p2-goal", ["p2-mid-2"]],
-
-  ["p2-spawn-2", ["p2-10"]],
-  ["p2-10", ["p2-spawn-2", "p2-9"]],
-  ["p2-9", ["p2-10", "p2-8"]],
-  ["p2-8", ["p2-9", "p2-7", "p2-3"]],
-  ["p2-7", ["p2-8", "p2-6"]],
-  ["p2-6", ["p2-7", "p2-5"]],
-]);
 
 const state = {
+  board: [],
+  units: [],
   currentPlayer: 1,
   selectedId: null,
-  reachable: new Set(),
+  reachable: new Map(),
   round: 1,
   gameOver: false,
   lastMove: null,
-  units: [],
-  board: new Map(),
   moveCount: 0,
 };
 
@@ -108,49 +56,58 @@ function keyFor(x, y) {
   return `${x},${y}`;
 }
 
-function makeUnits() {
+function makeBoard() {
+  return Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
+}
+
+function createUnits() {
   return [1, 2].flatMap((player) =>
-    UNIT_TEMPLATES.flatMap((template, archetypeIndex) =>
-      Array.from({ length: 2 }, (_, copyIndex) => ({
-        ...template,
-        player,
-        id: `${template.id}-${player}-${copyIndex}`,
-        name: `${template.name} ${copyIndex + 1}`,
-        slot: archetypeIndex * 2 + copyIndex,
-        alive: true,
-        location: null,
-      }))
-    )
+    UNIT_TEMPLATES.map((template, index) => ({
+      ...template,
+      player,
+      id: `${template.id}-${player}-${index}`,
+      name: `${template.name} ${index + 1}`,
+      alive: true,
+      x: null,
+      y: null,
+      location: null,
+    }))
   );
 }
 
-function getUnitById(id) {
-  return state.units.find((unit) => unit.id === id) ?? null;
+function isSpawnTile(x, y, player) {
+  return SPAWN_POSITIONS[player].some((spot) => spot.x === x && spot.y === y);
+}
+
+function isGoalTile(x, y, player) {
+  const goal = GOAL_POSITIONS[player];
+  return goal.x === x && goal.y === y;
+}
+
+function getOccupant(x, y) {
+  if (x < 0 || y < 0 || x >= SIZE || y >= SIZE) return null;
+  const unitId = state.board[y][x];
+  return unitId ? state.units.find((unit) => unit.id === unitId) ?? null : null;
 }
 
 function getSelected() {
-  return state.selectedId ? getUnitById(state.selectedId) : null;
-}
-
-function getOccupant(nodeId) {
-  const unitId = state.board.get(nodeId);
-  return unitId ? getUnitById(unitId) : null;
+  return state.selectedId ? state.units.find((unit) => unit.id === state.selectedId) ?? null : null;
 }
 
 function setupGame() {
+  state.board = makeBoard();
+  state.units = createUnits();
   state.currentPlayer = 1;
   state.selectedId = null;
-  state.reachable = new Set();
+  state.reachable = new Map();
   state.round = 1;
+  state.moveCount = 0;
   state.gameOver = false;
   state.lastMove = null;
-  state.board = new Map();
-  state.units = makeUnits();
-  state.moveCount = 0;
 
   elements.log.replaceChildren();
   elements.round.textContent = "01";
-  elements.promptText.textContent = "Select a bench unit to deploy or choose a unit already in play.";
+  elements.promptText.textContent = "Select one of your units from the bench or board.";
   elements.cancel.hidden = true;
   elements.selectionState.textContent = "NO SELECTION";
   elements.legendCard.innerHTML = '<div class="empty-portrait" aria-hidden="true">✳</div><div class="legend-info"><p class="legend-name">Choose a unit</p><p class="legend-description">Bench, lane cover, and duel details appear here.</p></div>';
@@ -162,31 +119,42 @@ function setupGame() {
   updateTurnStatus();
 }
 
-function findReachable(unit) {
-  const reachable = new Set();
+function collectReachable(unit) {
+  const reachable = new Map();
 
   if (!unit.location) {
-    const spawnNodes = BOARD_DEFS.filter((node) => node.spawnFor === unit.player && !getOccupant(node.id));
-    for (const node of spawnNodes) reachable.add(node.id);
+    for (const spawn of SPAWN_POSITIONS[unit.player]) {
+      if (!getOccupant(spawn.x, spawn.y)) {
+        reachable.set(keyFor(spawn.x, spawn.y), { x: spawn.x, y: spawn.y, occupant: null });
+      }
+    }
     return reachable;
   }
 
-  const queue = [{ id: unit.location, steps: 0 }];
-  const visited = new Set([unit.location]);
+  const queue = [{ x: unit.x, y: unit.y, steps: 0 }];
+  const visited = new Set([keyFor(unit.x, unit.y)]);
 
   while (queue.length) {
     const current = queue.shift();
-    const neighbors = BOARD_GRAPH.get(current.id) ?? [];
-
-    for (const neighborId of neighbors) {
-      if (visited.has(neighborId)) continue;
-      const occupant = getOccupant(neighborId);
+    for (const [dx, dy] of DIRECTIONS) {
+      const nx = current.x + dx;
+      const ny = current.y + dy;
+      const nextKey = keyFor(nx, ny);
       const nextSteps = current.steps + 1;
+
+      if (nx < 0 || ny < 0 || nx >= SIZE || ny >= SIZE) continue;
+      if (visited.has(nextKey)) continue;
       if (nextSteps > unit.move) continue;
+
+      const occupant = getOccupant(nx, ny);
       if (occupant && occupant.player === unit.player) continue;
-      visited.add(neighborId);
-      reachable.add(neighborId);
-      if (!occupant) queue.push({ id: neighborId, steps: nextSteps });
+
+      visited.add(nextKey);
+      reachable.set(nextKey, { x: nx, y: ny, occupant });
+
+      if (!occupant) {
+        queue.push({ x: nx, y: ny, steps: nextSteps });
+      }
     }
   }
 
@@ -194,17 +162,17 @@ function findReachable(unit) {
 }
 
 function selectUnit(unit) {
-  if (!unit || state.gameOver) return;
+  if (!unit || !unit.alive || state.gameOver) return;
   if (unit.player !== state.currentPlayer) {
     showToast("It is not that side's turn.");
     return;
   }
 
   state.selectedId = unit.id;
-  state.reachable = findReachable(unit);
+  state.reachable = collectReachable(unit);
   elements.promptText.textContent = unit.location
     ? `${unit.name} can move to a connected space or strike a rival.`
-    : `${unit.name} is in the bench. Pick an open spawn tile for your side.`;
+    : `${unit.name} is in the bench. Choose an open spawn tile for your side.`;
   elements.cancel.hidden = false;
   elements.selectionState.textContent = `PLAYER ${unit.player}`;
   render();
@@ -221,34 +189,25 @@ function renderBoard() {
   const fragment = document.createDocumentFragment();
   const selected = getSelected();
 
-  for (let y = 0; y <= 6; y += 1) {
-    for (let x = 0; x <= 6; x += 1) {
+  for (let y = 0; y < SIZE; y += 1) {
+    for (let x = 0; x < SIZE; x += 1) {
       const key = keyFor(x, y);
-      const node = BOARD_DEFS.find((entry) => entry.x === x && entry.y === y);
       const cell = document.createElement("button");
-      const occupant = node ? getOccupant(node.id) : null;
-      const target = node ? state.reachable.has(node.id) : false;
+      const occupant = getOccupant(x, y);
+      const target = state.reachable.get(key);
+      const isSelected = selected && selected.x === x && selected.y === y;
+      const lastMove = state.lastMove && state.lastMove.x === x && state.lastMove.y === y;
 
       cell.type = "button";
       cell.className = "cell";
-      cell.dataset.x = String(x);
-      cell.dataset.y = String(y);
-      cell.dataset.node = node ? node.id : "";
       cell.setAttribute("role", "gridcell");
-      cell.setAttribute("aria-label", node ? `${node.id}, ${occupant ? `${occupant.name}, Player ${occupant.player}` : "empty lane space"}` : `Empty grid space ${x + 1}, ${y + 1}`);
+      cell.setAttribute("aria-label", occupant ? `${occupant.name}, Player ${occupant.player}` : `Tile ${x + 1}, ${y + 1}`);
 
-      if (node) {
-        if (node.spawnFor) cell.classList.add("is-spawn");
-        if (node.goalFor) cell.classList.add("is-goal");
-        if (target && occupant && occupant.player !== state.currentPlayer) cell.classList.add("is-duel");
-        if (target && (!occupant || occupant.player === state.currentPlayer)) cell.classList.add("is-move");
-        if (selected && selected.location === node.id) cell.classList.add("is-selected");
-      }
-
-      if (state.lastMove) {
-        const lastNode = BOARD_DEFS.find((entry) => entry.id === state.lastMove);
-        if (lastNode && lastNode.x === x && lastNode.y === y) cell.classList.add("is-last-move");
-      }
+      if (isSpawnTile(x, y, 1) || isSpawnTile(x, y, 2)) cell.classList.add("is-spawn");
+      if (isGoalTile(x, y, 1) || isGoalTile(x, y, 2)) cell.classList.add("is-goal");
+      if (target) cell.classList.add(target.occupant ? "is-duel" : "is-move");
+      if (isSelected) cell.classList.add("is-selected");
+      if (lastMove) cell.classList.add("is-last-move");
 
       if (occupant) {
         const piece = document.createElement("span");
@@ -257,8 +216,8 @@ function renderBoard() {
         cell.append(piece);
       }
 
-      cell.disabled = state.gameOver || !node;
-      if (node) cell.addEventListener("click", () => onCellClick(node.id));
+      cell.disabled = state.gameOver;
+      cell.addEventListener("click", () => onCellClick(x, y));
       fragment.append(cell);
     }
   }
@@ -301,12 +260,13 @@ function renderLegend(unit) {
   elements.legendStats.insertAdjacentHTML("afterend", `<div class="mini-die" aria-label="${unit.name}'s die faces">${faces}</div>`);
 }
 
-function onCellClick(nodeId) {
+function onCellClick(x, y) {
   if (state.gameOver) return;
 
+  const key = keyFor(x, y);
+  const occupant = getOccupant(x, y);
   const selected = getSelected();
-  const node = BOARD_DEFS.find((entry) => entry.id === nodeId);
-  const occupant = getOccupant(nodeId);
+  const target = state.reachable.get(key);
 
   if (!selected) {
     if (occupant && occupant.player === state.currentPlayer) {
@@ -317,19 +277,19 @@ function onCellClick(nodeId) {
     return;
   }
 
-  if (state.reachable.has(nodeId)) {
-    if (occupant && occupant.player !== selected.player) {
-      resolveDuel(selected, occupant, nodeId);
+  if (target) {
+    if (target.occupant && target.occupant.player !== selected.player) {
+      resolveDuel(selected, target.occupant, x, y);
       return;
     }
 
-    if (!selected.location && node && node.spawnFor === selected.player) {
-      deployUnit(selected, nodeId);
+    if (!selected.location && isSpawnTile(x, y, selected.player)) {
+      deployUnit(selected, x, y);
       return;
     }
 
     if (selected.location) {
-      moveUnit(selected, nodeId);
+      moveUnit(selected, x, y);
       return;
     }
   }
@@ -340,39 +300,39 @@ function onCellClick(nodeId) {
   }
 
   state.selectedId = null;
-  state.reachable = new Set();
-  elements.promptText.textContent = "That tile is not legal for this unit. Choose a highlighted space.";
+  state.reachable = new Map();
+  elements.promptText.textContent = "That tile is not legal for this unit. Pick a highlighted space.";
   elements.cancel.hidden = true;
   elements.selectionState.textContent = "NO SELECTION";
   render();
 }
 
-function deployUnit(unit, nodeId) {
-  const node = BOARD_DEFS.find((entry) => entry.id === nodeId);
-  if (!node || !node.spawnFor || node.spawnFor !== unit.player) return;
-  if (getOccupant(nodeId)) return;
+function deployUnit(unit, x, y) {
+  if (getOccupant(x, y)) return;
+  if (!isSpawnTile(x, y, unit.player)) return;
 
-  state.board.set(nodeId, unit.id);
-  unit.location = nodeId;
-  state.lastMove = nodeId;
+  state.board[y][x] = unit.id;
+  unit.x = x;
+  unit.y = y;
+  unit.location = keyFor(x, y);
+  unit.alive = true;
+  state.lastMove = { x, y };
   addLog(`${unit.name} deploys to the ${unit.player === 1 ? "Player One" : "Player Two"} spawn.`);
   endTurn();
 }
 
-function moveUnit(unit, nodeId) {
-  const previous = unit.location;
-  if (!previous) return;
+function moveUnit(unit, x, y) {
+  if (!unit.location) return;
 
-  const targetNode = BOARD_DEFS.find((entry) => entry.id === nodeId);
-  if (!targetNode) return;
-
-  state.board.delete(previous);
-  unit.location = nodeId;
-  state.board.set(nodeId, unit.id);
-  state.lastMove = nodeId;
+  state.board[unit.y][unit.x] = null;
+  unit.x = x;
+  unit.y = y;
+  unit.location = keyFor(x, y);
+  state.board[y][x] = unit.id;
+  state.lastMove = { x, y };
   addLog(`${unit.name} advances along the lane.`);
 
-  if (targetNode.goalFor && targetNode.goalFor !== unit.player) {
+  if (isGoalTile(x, y, unit.player)) {
     finishGame(unit.player, `${unit.name} reaches the opposing goal.`);
     return;
   }
@@ -380,8 +340,7 @@ function moveUnit(unit, nodeId) {
   endTurn();
 }
 
-function resolveDuel(attacker, defender, nodeId) {
-  const targetNode = BOARD_DEFS.find((entry) => entry.id === nodeId);
+function resolveDuel(attacker, defender, x, y) {
   const attackerRoll = roll(attacker);
   const defenderRoll = roll(defender);
   const attackerScore = attackerRoll.score;
@@ -394,24 +353,32 @@ function resolveDuel(attacker, defender, nodeId) {
   setDuelDisplay(attackerRoll.face, defenderRoll.face, attacker.name, defender.name, `${attackerScore} vs ${defenderScore} · ${outcome}`);
 
   if (attackerWins) {
-    state.board.delete(defender.location);
+    state.board[defender.y][defender.x] = null;
     defender.alive = false;
+    defender.x = null;
+    defender.y = null;
     defender.location = null;
 
-    state.board.delete(attacker.location);
-    attacker.location = nodeId;
-    state.board.set(nodeId, attacker.id);
-    state.lastMove = nodeId;
+    state.board[attacker.y][attacker.x] = null;
+    attacker.x = x;
+    attacker.y = y;
+    attacker.location = keyFor(x, y);
+    state.board[y][x] = attacker.id;
+    state.lastMove = { x, y };
+
     addLog(`${attacker.name} rolled ${attackerRoll.face}; ${defender.name} rolled ${defenderRoll.face}. ${outcome}`);
 
-    if (targetNode && targetNode.goalFor && targetNode.goalFor !== attacker.player) {
+    if (isGoalTile(x, y, attacker.player)) {
       finishGame(attacker.player, `${attacker.name} reaches the opposing goal after a duel.`);
       return;
     }
   } else {
-    state.board.delete(attacker.location);
+    state.board[attacker.y][attacker.x] = null;
     attacker.alive = false;
+    attacker.x = null;
+    attacker.y = null;
     attacker.location = null;
+
     addLog(`${attacker.name} rolled ${attackerRoll.face}; ${defender.name} rolled ${defenderRoll.face}. ${outcome}`);
   }
 
@@ -436,9 +403,9 @@ function endTurn() {
   if (state.currentPlayer === 2) state.round += 1;
   state.currentPlayer = state.currentPlayer === 1 ? 2 : 1;
   state.selectedId = null;
-  state.reachable = new Set();
+  state.reachable = new Map();
   elements.round.textContent = String(state.round).padStart(2, "0");
-  elements.promptText.textContent = `Player ${state.currentPlayer}, choose one of your units or a valid spawn.`;
+  elements.promptText.textContent = `Player ${state.currentPlayer}, choose a unit from the bench or a highlighted tile.`;
   elements.cancel.hidden = true;
   elements.selectionState.textContent = "NO SELECTION";
   render();
@@ -447,7 +414,7 @@ function endTurn() {
 function finishGame(player, message) {
   state.gameOver = true;
   state.selectedId = null;
-  state.reachable = new Set();
+  state.reachable = new Map();
   elements.promptText.textContent = `Player ${player} wins. ${message}`;
   elements.cancel.hidden = true;
   elements.selectionState.textContent = "GAME OVER";
@@ -499,8 +466,8 @@ function showToast(message) {
 
 elements.cancel.addEventListener("click", () => {
   state.selectedId = null;
-  state.reachable = new Set();
-  elements.promptText.textContent = "Select a bench unit or a valid board unit.";
+  state.reachable = new Map();
+  elements.promptText.textContent = "Select one of your units from the bench or board.";
   elements.cancel.hidden = true;
   elements.selectionState.textContent = "NO SELECTION";
   render();
@@ -513,5 +480,7 @@ document.querySelector("#new-game").addEventListener("click", setupGame);
 setupGame();
 
 window.__debugBoard = () => {
-  console.table(BOARD_DEFS.map((node) => ({ id: node.id, x: node.x, y: node.y, spawnFor: node.spawnFor ?? "-", goalFor: node.goalFor ?? "-" })));
+  console.table(Array.from({ length: SIZE }, (_, y) =>
+    Object.fromEntries(Array.from({ length: SIZE }, (_, x) => [String(x), state.board[y][x] ?? "-"]))
+  ));
 };
