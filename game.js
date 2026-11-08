@@ -1,4 +1,3 @@
-const SIZE = 7;
 const BENCH_SIZE = 6;
 
 const UNIT_TEMPLATES = [
@@ -10,62 +9,70 @@ const UNIT_TEMPLATES = [
 const BOARD_DEFS = [
   { id: "p1-s1", x: 0, y: 1, spawnFor: 1 },
   { id: "p1-s2", x: 0, y: 5, spawnFor: 1 },
-  { id: "p1-1", x: 1, y: 1 },
-  { id: "p1-2", x: 2, y: 1 },
-  { id: "p1-3", x: 3, y: 1 },
-  { id: "p1-4", x: 4, y: 1 },
-  { id: "p1-5", x: 5, y: 1 },
-  { id: "p1-6", x: 6, y: 1 },
-
-  { id: "p1-m1", x: 1, y: 3 },
-  { id: "p1-m2", x: 2, y: 3 },
-  { id: "p1-m3", x: 3, y: 3 },
-  { id: "p1-m4", x: 4, y: 3 },
-  { id: "p1-m5", x: 5, y: 3 },
-
-  { id: "p1-b1", x: 1, y: 5 },
-  { id: "p1-b2", x: 2, y: 5 },
-  { id: "p1-b3", x: 3, y: 5 },
-  { id: "p1-b4", x: 4, y: 5 },
-  { id: "p1-b5", x: 5, y: 5 },
+  { id: "p1-l1", x: 1, y: 1 },
+  { id: "p1-l2", x: 2, y: 1 },
+  { id: "p1-l3", x: 3, y: 1 },
+  { id: "p1-l4", x: 4, y: 1 },
+  { id: "p1-l5", x: 5, y: 1 },
+  { id: "p1-r1", x: 1, y: 5 },
+  { id: "p1-r2", x: 2, y: 5 },
+  { id: "p1-r3", x: 3, y: 5 },
+  { id: "p1-r4", x: 4, y: 5 },
+  { id: "p1-r5", x: 5, y: 5 },
+  { id: "p1-mid1", x: 3, y: 3 },
+  { id: "p1-mid2", x: 4, y: 3 },
+  { id: "p1-mid3", x: 5, y: 3 },
+  { id: "p1-goal", x: 6, y: 3, goalFor: 1 },
 
   { id: "p2-s1", x: 6, y: 1, spawnFor: 2 },
   { id: "p2-s2", x: 6, y: 5, spawnFor: 2 },
-  { id: "p2-1", x: 5, y: 1 },
-  { id: "p2-2", x: 4, y: 1 },
-  { id: "p2-3", x: 3, y: 1 },
-  { id: "p2-4", x: 2, y: 1 },
-  { id: "p2-5", x: 1, y: 1 },
-
-  { id: "p2-m1", x: 5, y: 3 },
-  { id: "p2-m2", x: 4, y: 3 },
-  { id: "p2-m3", x: 3, y: 3 },
-  { id: "p2-m4", x: 2, y: 3 },
-  { id: "p2-m5", x: 1, y: 3 },
-
-  { id: "p2-b1", x: 5, y: 5 },
-  { id: "p2-b2", x: 4, y: 5 },
-  { id: "p2-b3", x: 3, y: 5 },
-  { id: "p2-b4", x: 2, y: 5 },
-  { id: "p2-b5", x: 1, y: 5 },
-
-  { id: "p1-goal", x: 6, y: 3, goalFor: 1 },
+  { id: "p2-l1", x: 5, y: 1 },
+  { id: "p2-l2", x: 4, y: 1 },
+  { id: "p2-l3", x: 3, y: 1 },
+  { id: "p2-l4", x: 2, y: 1 },
+  { id: "p2-l5", x: 1, y: 1 },
+  { id: "p2-r1", x: 5, y: 5 },
+  { id: "p2-r2", x: 4, y: 5 },
+  { id: "p2-r3", x: 3, y: 5 },
+  { id: "p2-r4", x: 2, y: 5 },
+  { id: "p2-r5", x: 1, y: 5 },
+  { id: "p2-mid1", x: 3, y: 3 },
+  { id: "p2-mid2", x: 2, y: 3 },
+  { id: "p2-mid3", x: 1, y: 3 },
   { id: "p2-goal", x: 0, y: 3, goalFor: 2 },
 ];
 
-const BOARD_GRAPH = new Map();
+const BOARD_GRAPH = new Map([
+  ["p1-s1", ["p1-l1"]],
+  ["p1-l1", ["p1-s1", "p1-l2"]],
+  ["p1-l2", ["p1-l1", "p1-l3"]],
+  ["p1-l3", ["p1-l2", "p1-mid1"]],
+  ["p1-mid1", ["p1-l3", "p1-mid2", "p1-r3"]],
+  ["p1-mid2", ["p1-mid1", "p1-mid3"]],
+  ["p1-mid3", ["p1-mid2", "p1-goal"]],
+  ["p1-goal", ["p1-mid3"]],
 
-for (const node of BOARD_DEFS) {
-  const neighbors = new Set();
-  for (const other of BOARD_DEFS) {
-    if (other.id === node.id) continue;
-    const distX = Math.abs(node.x - other.x);
-    const distY = Math.abs(node.y - other.y);
-    const isNeighbor = (distX + distY) === 1 || (distX === 1 && distY === 2) || (distX === 2 && distY === 1);
-    if (isNeighbor) neighbors.add(other.id);
-  }
-  BOARD_GRAPH.set(node.id, [...neighbors]);
-}
+  ["p1-s2", ["p1-r1"]],
+  ["p1-r1", ["p1-s2", "p1-r2"]],
+  ["p1-r2", ["p1-r1", "p1-r3"]],
+  ["p1-r3", ["p1-r2", "p1-mid1"]],
+
+  ["p2-s1", ["p2-l1"]],
+  ["p2-l1", ["p2-s1", "p2-l2"]],
+  ["p2-l2", ["p2-l1", "p2-l3"]],
+  ["p2-l3", ["p2-l2", "p2-mid1"]],
+  ["p2-mid1", ["p2-l3", "p2-mid2", "p2-r3"]],
+  ["p2-mid2", ["p2-mid1", "p2-mid3"]],
+  ["p2-mid3", ["p2-mid2", "p2-goal"]],
+  ["p2-goal", ["p2-mid3"]],
+
+  ["p2-s2", ["p2-r1"]],
+  ["p2-r1", ["p2-s2", "p2-r2"]],
+  ["p2-r2", ["p2-r1", "p2-r3"]],
+  ["p2-r3", ["p2-r2", "p2-mid1"]],
+]);
+
+const BOARD_NODE_MAP = new Map(BOARD_DEFS.map((node) => [keyFor(node.x, node.y), node]));
 
 const state = {
   currentPlayer: 1,
@@ -90,6 +97,10 @@ const elements = {
   log: document.querySelector("#field-log"),
   toast: document.querySelector("#toast"),
 };
+
+function keyFor(x, y) {
+  return `${x},${y}`;
+}
 
 function makeUnits() {
   return [1, 2].flatMap((player) =>
@@ -132,7 +143,7 @@ function setupGame() {
 
   elements.log.replaceChildren();
   elements.round.textContent = "01";
-  elements.promptText.textContent = "Select one of your bench units to deploy or pick a unit on the board.";
+  elements.promptText.textContent = "Select a bench unit to deploy or choose a unit already in play.";
   elements.cancel.hidden = true;
   elements.selectionState.textContent = "NO SELECTION";
   elements.legendCard.innerHTML = '<div class="empty-portrait" aria-hidden="true">✳</div><div class="legend-info"><p class="legend-name">Choose a unit</p><p class="legend-description">Bench, lane cover, and duel details appear here.</p></div>';
@@ -146,8 +157,6 @@ function setupGame() {
 
 function findReachable(unit) {
   const reachable = new Set();
-  const visited = new Set();
-  const queue = [];
 
   if (!unit.location) {
     const spawnNodes = BOARD_DEFS.filter((node) => node.spawnFor === unit.player && !getOccupant(node.id));
@@ -155,8 +164,8 @@ function findReachable(unit) {
     return reachable;
   }
 
-  queue.push({ id: unit.location, steps: 0 });
-  visited.add(unit.location);
+  const queue = [{ id: unit.location, steps: 0 }];
+  const visited = new Set([unit.location]);
 
   while (queue.length) {
     const current = queue.shift();
@@ -205,34 +214,46 @@ function renderBoard() {
   const fragment = document.createDocumentFragment();
   const selected = getSelected();
 
-  for (const node of BOARD_DEFS) {
-    const cell = document.createElement("button");
-    const occupant = getOccupant(node.id);
-    const target = state.reachable.has(node.id);
+  for (let y = 0; y <= 6; y += 1) {
+    for (let x = 0; x <= 6; x += 1) {
+      const key = keyFor(x, y);
+      const node = BOARD_NODE_MAP.get(key);
+      const cell = document.createElement("button");
+      const occupant = node ? getOccupant(node.id) : null;
+      const target = node ? state.reachable.has(node.id) : false;
 
-    cell.type = "button";
-    cell.className = "cell";
-    cell.dataset.nodeId = node.id;
-    cell.setAttribute("role", "gridcell");
-    cell.setAttribute("aria-label", `${node.id}, ${occupant ? `${occupant.name} player ${occupant.player}` : "empty space"}`);
+      cell.type = "button";
+      cell.className = "cell";
+      cell.dataset.x = String(x);
+      cell.dataset.y = String(y);
+      cell.dataset.node = node ? node.id : "";
+      cell.setAttribute("role", "gridcell");
+      cell.setAttribute("aria-label", node ? `${node.id}, ${occupant ? `${occupant.name}, Player ${occupant.player}` : "empty lane space"}` : `Empty grid space ${x + 1}, ${y + 1}`);
 
-    if (node.spawnFor) cell.classList.add("is-spawn");
-    if (node.goalFor) cell.classList.add("is-goal");
-    if (target && occupant && occupant.player !== state.currentPlayer) cell.classList.add("is-duel");
-    if (target && (!occupant || occupant.player === state.currentPlayer || !occupant)) cell.classList.add("is-move");
-    if (selected && selected.location === node.id) cell.classList.add("is-selected");
-    if (state.lastMove && state.lastMove === node.id) cell.classList.add("is-last-move");
+      if (node) {
+        if (node.spawnFor) cell.classList.add("is-spawn");
+        if (node.goalFor) cell.classList.add("is-goal");
+        if (target && occupant && occupant.player !== state.currentPlayer) cell.classList.add("is-duel");
+        if (target && (!occupant || occupant.player === state.currentPlayer || !occupant)) cell.classList.add("is-move");
+        if (selected && selected.location === node.id) cell.classList.add("is-selected");
+      }
 
-    if (occupant) {
-      const piece = document.createElement("span");
-      piece.className = `piece ${occupant.player === 2 ? "player-two" : ""} ${state.selectedId === occupant.id ? "is-active" : ""}`;
-      piece.textContent = occupant.mark;
-      cell.append(piece);
+      if (state.lastMove) {
+        const lastNode = BOARD_DEFS.find((entry) => entry.id === state.lastMove);
+        if (lastNode && lastNode.x === x && lastNode.y === y) cell.classList.add("is-last-move");
+      }
+
+      if (occupant) {
+        const piece = document.createElement("span");
+        piece.className = `piece ${occupant.player === 2 ? "player-two" : ""} ${state.selectedId === occupant.id ? "is-active" : ""}`;
+        piece.textContent = occupant.mark;
+        cell.append(piece);
+      }
+
+      cell.disabled = state.gameOver || !node;
+      if (node) cell.addEventListener("click", () => onCellClick(node.id));
+      fragment.append(cell);
     }
-
-    cell.disabled = state.gameOver || !!(node.spawnFor && node.spawnFor !== state.currentPlayer && !occupant);
-    cell.addEventListener("click", () => onCellClick(node.id));
-    fragment.append(cell);
   }
 
   elements.board.replaceChildren(fragment);
@@ -295,7 +316,7 @@ function onCellClick(nodeId) {
       return;
     }
 
-    if (!selected.location && node.spawnFor === selected.player) {
+    if (!selected.location && node && node.spawnFor === selected.player) {
       deployUnit(selected, nodeId);
       return;
     }
@@ -335,13 +356,16 @@ function moveUnit(unit, nodeId) {
   const previous = unit.location;
   if (!previous) return;
 
+  const targetNode = BOARD_DEFS.find((entry) => entry.id === nodeId);
+  if (!targetNode) return;
+
   state.board.delete(previous);
   unit.location = nodeId;
   state.board.set(nodeId, unit.id);
   state.lastMove = nodeId;
   addLog(`${unit.name} advances along the lane.`);
 
-  if (nodeId === `p${unit.player}-goal`) {
+  if (targetNode.goalFor && targetNode.goalFor !== unit.player) {
     finishGame(unit.player, `${unit.name} reaches the opposing goal.`);
     return;
   }
@@ -350,6 +374,7 @@ function moveUnit(unit, nodeId) {
 }
 
 function resolveDuel(attacker, defender, nodeId) {
+  const targetNode = BOARD_DEFS.find((entry) => entry.id === nodeId);
   const attackerRoll = roll(attacker);
   const defenderRoll = roll(defender);
   const attackerScore = attackerRoll.score;
@@ -366,14 +391,15 @@ function resolveDuel(attacker, defender, nodeId) {
     defender.alive = false;
     defender.location = null;
 
-    state.board.delete(attacker.location);
+    const previousLocation = attacker.location;
+    state.board.delete(previousLocation);
     attacker.location = nodeId;
     state.board.set(nodeId, attacker.id);
     state.lastMove = nodeId;
     addLog(`${attacker.name} rolled ${attackerRoll.face}; ${defender.name} rolled ${defenderRoll.face}. ${outcome}`);
 
-    if (nodeId === `p${attacker.player}-goal`) {
-      finishGame(attacker.player, `${attacker.name} reaches the goal after a duel.`);
+    if (targetNode && targetNode.goalFor && targetNode.goalFor !== attacker.player) {
+      finishGame(attacker.player, `${attacker.name} reaches the opposing goal after a duel.`);
       return;
     }
   } else {
@@ -481,11 +507,8 @@ document.querySelector("#new-game").addEventListener("click", setupGame);
 setupGame();
 
 window.addEventListener("DOMContentLoaded", () => {
-  document.querySelector("#board").setAttribute("aria-label", "Connected board with spawn points and goal lane");
+  document.querySelector("#board").setAttribute("aria-label", "Board with spawn points, a connected lane, and opposing goals");
 });
-
-const boardNodeLookup = Object.fromEntries(BOARD_DEFS.map((node) => [node.id, node]));
-window.boardNodeLookup = boardNodeLookup;
 
 window.__debugBoard = () => {
   console.table(BOARD_DEFS.map((node) => ({ id: node.id, x: node.x, y: node.y, spawnFor: node.spawnFor ?? "-", goalFor: node.goalFor ?? "-" })));
