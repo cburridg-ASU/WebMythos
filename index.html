@@ -30,7 +30,7 @@
           <p class="eyebrow">A TACTICAL GAME OF PATHS & CHANCE</p>
           <h1 id="page-title">The Crossing</h1>
         </div>
-        <p class="intro-copy">Guide your legends across the field. Read the board, choose your moment, and let the dice decide the duel.</p>
+        <p class="intro-copy">Deploy from your bench, thread the lane, and reach the opposing goal before your rival does.</p>
       </section>
 
       <section class="game-layout" aria-label="Mythos game">
@@ -48,30 +48,30 @@
           </div>
 
           <div class="board-frame">
-            <div class="board-axis" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span></div>
-            <div class="board" id="board" role="grid" aria-label="Seven by seven game board"></div>
-            <div class="board-caption"><span>WESTERN GATE</span><span>THE CROSSING</span><span>EASTERN GATE</span></div>
+            <div class="board-axis" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+            <div class="board" id="board" role="grid" aria-label="Connected board with spawn points and goal lane"></div>
+            <div class="board-caption"><span>PLAYER ONE SIDE</span><span>GOAL LANE</span><span>PLAYER TWO SIDE</span></div>
           </div>
 
           <div class="turn-prompt" id="turn-prompt" aria-live="polite">
             <span class="prompt-symbol" aria-hidden="true">↗</span>
-            <span id="prompt-text">Select one of your legends to see its moves.</span>
+            <span id="prompt-text">Select a bench unit or a valid board unit.</span>
             <button id="cancel-selection" type="button" class="text-button" hidden>Cancel</button>
           </div>
         </div>
 
         <aside class="side-panel">
           <section class="panel-section active-legend-section">
-            <div class="section-heading"><h2>LEGEND</h2><span id="selection-state">NO SELECTION</span></div>
+            <div class="section-heading"><h2>UNIT</h2><span id="selection-state">NO SELECTION</span></div>
             <div class="legend-card" id="legend-card">
               <div class="empty-portrait" aria-hidden="true">✳</div>
-              <div class="legend-info"><p class="legend-name">Choose a legend</p><p class="legend-description">Their path and die will appear here.</p></div>
+              <div class="legend-info"><p class="legend-name">Choose a unit</p><p class="legend-description">Bench, lane cover, and duel details appear here.</p></div>
             </div>
             <div class="legend-stats" id="legend-stats" hidden></div>
           </section>
 
           <section class="panel-section roster-section">
-            <div class="section-heading"><h2>YOUR LEGENDS</h2><span>3 FIGURES</span></div>
+            <div class="section-heading"><h2>BENCH</h2><span>6 UNITS</span></div>
             <div class="roster" id="roster"></div>
           </section>
 
@@ -82,7 +82,7 @@
               <span class="versus">VS</span>
               <div class="die-wrap"><span id="defender-label">—</span><div class="die" id="defender-die">·</div></div>
             </div>
-            <p class="duel-result" id="duel-result">A duel appears here when legends meet.</p>
+            <p class="duel-result" id="duel-result">A duel appears here when units meet.</p>
           </section>
 
           <section class="panel-section log-section">
@@ -93,8 +93,8 @@
       </section>
 
       <footer class="footer-note">
-        <span><kbd>CLICK</kbd> Choose a legend and a highlighted tile</span>
-        <span><i class="legend-dot move-dot"></i> Move <i class="legend-dot duel-dot"></i> Duel <i class="legend-dot goal-dot"></i> Gate</span>
+        <span><kbd>CLICK</kbd> Choose a unit, then a highlighted lane tile or spawn</span>
+        <span><i class="legend-dot move-dot"></i> Move <i class="legend-dot duel-dot"></i> Duel <i class="legend-dot goal-dot"></i> Goal</span>
       </footer>
     </main>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>

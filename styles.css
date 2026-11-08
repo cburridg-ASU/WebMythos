@@ -35,11 +35,11 @@ button { font: inherit; }
 .game-shell { width: min(1180px, calc(100% - 64px)); margin: 0 auto; }
 .topbar { height: 74px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
 .wordmark { display: inline-flex; gap: 10px; align-items: center; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 800; letter-spacing: 2px; }
-.wordmark-mark { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid var(--forest); color: var(--forest); font-family: Georgia, serif; font-size: 21px; font-weight: 400; }
-.topbar-note, .eyebrow, .section-heading, .player-chip small, .round-label small, .board-caption, .die-wrap > span, .legend-stats, .footer-note, .field-log time { font-family: "DM Mono", monospace; letter-spacing: .7px; }
+.wordmark-mark { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid var(--forest); color: var(--forest); font-family: Georgia, serif; font-size: 21px; }
+.topbar-note, .eyebrow, .section-heading, .player-chip small, .round-label small, .board-caption, .die-wrap > span, .legend-stats, .footer-note, .field-log time { font-family: "DM Mono", monospace; }
 .topbar-note { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 10px; }
 .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #81a968; box-shadow: 0 0 0 3px #81a96824; }
-.icon-button { display: grid; width: 36px; height: 36px; place-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 3px; background: var(--paper-bright); color: var(--ink); cursor: pointer; transition: background .2s, color .2s, transform .2s; }
+.icon-button { display: grid; width: 36px; height: 36px; place-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 3px; background: var(--paper-bright); color: var(--ink); cursor: pointer; transition: transform .2s ease, background .2s ease, color .2s ease; }
 .icon-button:hover { background: var(--forest); color: white; transform: rotate(-18deg); }
 .icon-button svg { width: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -64,8 +64,8 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 42px;
 
 .board-frame { padding: 14px 14px 10px; border: 1px solid var(--line); background: #e9e4d7; }
 .board-axis { display: grid; grid-template-columns: repeat(7, 1fr); margin: 0 0 6px 22px; color: #898b7d; text-align: center; font: 9px "DM Mono", monospace; }
-.board { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; aspect-ratio: 1; padding: 3px; background: #c9c5b7; border: 1px solid #c9c5b7; }
-.cell { position: relative; display: grid; min-width: 0; min-height: 0; place-items: center; border: 0; padding: 0; background: var(--board); color: var(--ink); cursor: pointer; transition: background .12s, transform .12s, box-shadow .12s; }
+.board { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; aspect-ratio: 1; padding: 3px; background: #c9c5b7; border: 1px solid #c9c5b7; }
+.cell { position: relative; display: grid; min-width: 0; min-height: 0; place-items: center; border: 0; padding: 0; background: var(--board); color: var(--ink); cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; min-height: 62px; }
 .cell:nth-child(odd) { background: var(--board-dark); }
 .cell::before { position: absolute; inset: 18%; border: 1px solid #b1ae9f; border-radius: 50%; content: ""; opacity: .44; }
 .cell:hover:not(:disabled) { z-index: 1; transform: scale(.94); box-shadow: 0 0 0 2px var(--ink); }
@@ -76,13 +76,14 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 42px;
 .cell.is-goal { background: #edd68e; }
 .cell.is-selected { box-shadow: inset 0 0 0 3px var(--forest); }
 .cell.is-last-move { box-shadow: inset 0 0 0 2px #e3b34d; }
+.cell.is-spawn { background: rgba(39, 91, 72, 0.12); }
 .cell.gate-west::after, .cell.gate-east::after { position: absolute; top: 4px; bottom: 4px; width: 3px; border-radius: 2px; content: ""; }
 .cell.gate-west::after { left: 3px; background: var(--forest); }
 .cell.gate-east::after { right: 3px; background: var(--coral); }
 .cell:disabled { cursor: default; }
 .cell:disabled:hover { transform: none; box-shadow: none; }
 .cell.is-move:disabled, .cell.is-duel:disabled { cursor: pointer; }
-.piece { position: relative; z-index: 1; display: grid; width: 72%; max-width: 48px; aspect-ratio: 1; place-items: center; border: 2px solid #f4efdf; border-radius: 50%; background: var(--forest); box-shadow: 0 2px 3px #21372d55; color: white; font-family: Georgia, serif; font-size: 19px; transition: transform .15s; }
+.piece { position: relative; z-index: 1; display: grid; width: 72%; max-width: 48px; aspect-ratio: 1; place-items: center; border: 2px solid #f4efdf; border-radius: 50%; background: var(--forest); color: white; font-family: Georgia, serif; font-size: 14px; }
 .piece.player-two { background: var(--coral); }
 .cell:hover .piece { transform: scale(1.07); }
 .piece.is-active { outline: 2px solid var(--sun); outline-offset: 2px; }
@@ -101,7 +102,7 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 42px;
 .section-heading h2 { margin: 0; color: #5b695f; font-size: 9px; font-weight: 500; }
 .section-heading > span { color: #9a9c90; font-size: 8px; }
 .legend-card { display: flex; min-height: 65px; align-items: center; gap: 12px; }
-.empty-portrait, .legend-portrait { display: grid; width: 48px; height: 48px; flex: 0 0 auto; place-items: center; border: 1px solid #d5dacb; border-radius: 50%; background: #e7eddf; color: var(--forest); font-family: Georgia, serif; font-size: 24px; }
+.empty-portrait, .legend-portrait { display: grid; width: 48px; height: 48px; flex: 0 0 auto; place-items: center; border: 1px solid #d5dacb; border-radius: 50%; background: #e7eddf; color: var(--forest); font-family: Georgia, serif; font-size: 22px; }
 .legend-portrait.player-two { border-color: #ebc8b7; background: #f5e4d9; color: #b6543e; }
 .legend-info { min-width: 0; }
 .legend-name { overflow: hidden; margin: 0 0 3px; font-family: Georgia, serif; font-size: 17px; text-overflow: ellipsis; white-space: nowrap; }
@@ -128,7 +129,7 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 42px;
 .dice-stage { display: flex; align-items: center; justify-content: space-around; padding: 3px 0 2px; }
 .die-wrap { display: grid; justify-items: center; gap: 5px; }
 .die-wrap > span { color: #85877a; font-size: 8px; }
-.die { display: grid; width: 43px; height: 43px; place-items: center; border: 1px solid #d8d5c9; border-radius: 5px; background: #f5f2e8; color: var(--forest); font-family: Georgia, serif; font-size: 20px; box-shadow: 0 2px 0 #d9d4c6; }
+.die { display: grid; width: 43px; height: 43px; place-items: center; border: 1px solid #d8d5c9; border-radius: 5px; background: #f5f2e8; color: var(--forest); font-family: Georgia, serif; font-size: 17px; }
 .die.player-two { color: #b95640; }
 .die.is-roll { animation: roll .35s ease-out; }
 .versus { color: #aaa99d; font: 9px "DM Mono", monospace; }
@@ -145,7 +146,7 @@ kbd { padding: 3px 5px; border: 1px solid #d5d2c8; background: #faf8f1; color: #
 .move-dot { background: #7da36e; }
 .duel-dot { background: var(--coral); }
 .goal-dot { background: var(--sun); }
-.toast { position: fixed; right: 20px; bottom: 20px; z-index: 4; max-width: min(360px, calc(100vw - 40px)); padding: 12px 16px; border: 1px solid #315947; background: var(--forest-dark); color: white; font-size: 12px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: opacity .2s, transform .2s; }
+.toast { position: fixed; right: 20px; bottom: 20px; z-index: 4; max-width: min(360px, calc(100vw - 40px)); padding: 12px 16px; border: 1px solid #315947; background: var(--forest-dark); color: white; font-size: 11px; opacity: 0; transform: translateY(6px); transition: opacity .2s ease, transform .2s ease; }
 .toast.is-visible { opacity: 1; transform: translateY(0); }
 
 @media (max-width: 900px) {
